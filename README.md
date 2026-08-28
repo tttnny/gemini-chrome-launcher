@@ -27,7 +27,7 @@ Chrome 的 Gemini 侧边栏可用性由**服务端 variations 判定**控制，�
 bash mac/build-mac.sh
 ```
 
-脚本会在 `~/Applications/` 生成 `Gemini Chrome.app`（自动复用本机 Chrome 图标）：
+脚本会在 `~/Applications/` 生成 `Gemini Chrome.app`（内置 Gemini 星星图标，图标素材来自 Google 官方 `gstatic.com` 资源）：
 
 1. 把它拖到 Dock，顶替原 Chrome 图标位置
 2. **先 Cmd+Q 完全退出 Chrome**，再点它启动（参数只对全新进程生效，Chrome 已运行时点击会弹窗提醒）

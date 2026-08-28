@@ -17,8 +17,11 @@ cp "$SRC/Gemini Chrome.app/Contents/Info.plist"   "$DEST/Contents/Info.plist"
 cp "$SRC/Gemini Chrome.app/Contents/MacOS/run.sh" "$DEST/Contents/MacOS/run.sh"
 chmod +x "$DEST/Contents/MacOS/run.sh"
 
-# 图标：若本机已装 Chrome，直接复用其图标（避免在仓库中携带商标资源）
-if [ -f "/Applications/Google Chrome.app/Contents/Resources/app.icns" ]; then
+# 图标：优先使用仓库内置的 Gemini 图标；本机装有 Chrome 时回退复用其图标
+if [ -f "$SRC/Gemini Chrome.app/Contents/Resources/app.icns" ]; then
+    cp "$SRC/Gemini Chrome.app/Contents/Resources/app.icns" "$DEST/Contents/Resources/app.icns"
+    echo "图标: 使用内置 Gemini 图标"
+elif [ -f "/Applications/Google Chrome.app/Contents/Resources/app.icns" ]; then
     cp "/Applications/Google Chrome.app/Contents/Resources/app.icns" "$DEST/Contents/Resources/app.icns"
     echo "图标: 已复用本机 Chrome 图标"
 fi
