@@ -1,14 +1,20 @@
 #!/bin/bash
 # =============================================================================
 #  Gemini Chrome Launcher - macOS 一键构建脚本
-#  作用：在 ~/Applications 下生成 "Gemini Chrome.app" 启动包装器，
-#        双击它即以完整 Glic 参数启动 Chrome，规避 Sequoia 只读系统卷限制。
+#  作用：生成 "Gemini Chrome.app" 启动包装器（默认 /Applications，
+#        写不进则回退 ~/Applications），双击它即以完整 Glic 参数启动 Chrome。
 #  用法：bash build-mac.sh
 # =============================================================================
 set -e
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
-DEST="$HOME/Applications/Gemini Chrome.app"
+
+# 默认安装到 /Applications；若系统对该目录限制（少数 Sequoia 环境），回退用户目录
+if [ -d /Applications ] && [ -w /Applications ]; then
+    DEST="/Applications/Gemini Chrome.app"
+else
+    DEST="$HOME/Applications/Gemini Chrome.app"
+fi
 
 echo "构建目标: $DEST"
 mkdir -p "$DEST/Contents/MacOS" "$DEST/Contents/Resources"
