@@ -1,26 +1,32 @@
-# Gemini Chrome Launcher - 创建桌面快捷方式（可选，替代 .cmd）
-# 用法：右键"以 PowerShell 运行"，或在 PowerShell 中执行：
+# Gemini Chrome Launcher - create a desktop shortcut (optional, replaces the .cmd)
+# Usage: right-click "Run with PowerShell", or run:
 #   powershell -ExecutionPolicy Bypass -File install-shortcut.ps1
+#
+# ASCII-only on purpose, so the file stays readable regardless of the
+# encoding PowerShell happens to assume for the current code page.
 
 $Chrome = "C:\Program Files\Google\Chrome\Application\chrome.exe"
 if (-not (Test-Path $Chrome)) {
     $Chrome = "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe"
 }
 if (-not (Test-Path $Chrome)) {
-    Write-Host "[错误] 未找到 Chrome" -ForegroundColor Red
+    Write-Host "[ERROR] Chrome not found" -ForegroundColor Red
     exit 1
 }
 
-$Args = "--lang=en-US --variations-override-country=us --enable-features=Glic,GlicSidePanel,GlicButton,GlicWarming,GlicZeroStateSuggestions"
+# No --lang on purpose: Glic availability is independent of the UI language,
+# so Chrome keeps the language the profile is already using.
+$LaunchArgs = "--variations-override-country=us --enable-features=Glic,GlicSidePanel,GlicButton,GlicWarming,GlicZeroStateSuggestions"
 
 $WshShell = New-Object -ComObject WScript.Shell
 $Desktop = [Environment]::GetFolderPath("Desktop")
 $Shortcut = $WshShell.CreateShortcut("$Desktop\Gemini Chrome.lnk")
 $Shortcut.TargetPath = $Chrome
-$Shortcut.Arguments = $Args
+$Shortcut.Arguments = $LaunchArgs
 $Shortcut.IconLocation = "$Chrome,0"
-$Shortcut.Description = "以 Gemini 参数启动 Chrome（需先完全退出已运行的 Chrome）"
+$Shortcut.Description = "Launch Chrome with the Gemini (Glic) flags. Quit Chrome completely first."
 $Shortcut.Save()
 
-Write-Host "[完成] 桌面快捷方式已创建：Gemini Chrome.lnk" -ForegroundColor Green
-Write-Host "[提示] 若 Chrome 已在运行，快捷方式不会生效，请先完全退出 Chrome。" -ForegroundColor Yellow
+Write-Host "[OK] Desktop shortcut created: Gemini Chrome.lnk" -ForegroundColor Green
+Write-Host "[NOTE] If Chrome is already running the shortcut has no effect." -ForegroundColor Yellow
+Write-Host "       Quit Chrome completely, then use the shortcut." -ForegroundColor Yellow

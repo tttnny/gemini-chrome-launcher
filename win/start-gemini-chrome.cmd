@@ -1,6 +1,25 @@
 @echo off
-chcp 65001 >nul
-title Gemini Chrome 启动器
+setlocal
+title Gemini Chrome Launcher (Windows)
+
+REM ============================================================
+REM  This file is ASCII-only on purpose. Do NOT add non-ASCII
+REM  characters.
+REM
+REM  cmd.exe parses batch files byte by byte using the current OEM
+REM  code page. Non-ASCII bytes inside a .cmd can be decoded into
+REM  metacharacters (| & > <) which split the line, and the launch
+REM  command gets silently skipped.
+REM  The previous Gemini-Setup-Win.bat in the sibling repository
+REM  failed for exactly this reason: its Chinese text broke the
+REM  parser and the python call never ran.
+REM
+REM  No --lang is passed on purpose. Glic availability is
+REM  independent of the UI language (verified: --lang=zh-CN works
+REM  exactly the same as --lang=en-US), so Chrome keeps whatever
+REM  language the profile is already using.
+REM ============================================================
+
 echo ============================================
 echo    Gemini Chrome Launcher (Windows)
 echo ============================================
@@ -9,27 +28,25 @@ echo.
 set "CHROME=C:\Program Files\Google\Chrome\Application\chrome.exe"
 if not exist "%CHROME%" set "CHROME=%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe"
 if not exist "%CHROME%" (
-    echo [错误] 未找到 Chrome，请检查安装路径。
+    echo [ERROR] Chrome not found. Check your installation path.
     pause
     exit /b 1
 )
 
-rem 检测 Chrome 是否正在运行（参数只对全新进程生效）
+rem Launch flags only take effect on a brand-new browser process.
 tasklist /FI "IMAGENAME eq chrome.exe" 2>nul | find /I "chrome.exe" >nul
 if %errorlevel%==0 (
-    echo [提示] Chrome 正在运行。
-    echo        请先完全退出 Chrome（托盘图标右键 - 退出），再重新运行本脚本，
-    echo        否则启动参数不会生效。
+    echo [STOP] Chrome is already running.
+    echo        Launch flags are ignored by an existing process.
+    echo        Quit Chrome completely first ^(tray icon - Exit^),
+    echo        then run this script again.
     echo.
-    timeout /t 5 >nul
+    pause
     exit /b 1
 )
 
-echo [启动] 正在以 Gemini 参数启动 Chrome...
-start "" "%CHROME%" ^
-  --lang=en-US ^
-  --variations-override-country=us ^
-  --enable-features=Glic,GlicSidePanel,GlicButton,GlicWarming,GlicZeroStateSuggestions
-echo [完成] Chrome 已启动。如果侧边栏仍不可用，请检查美国住宅 IP。
+echo [RUN] Starting Chrome with the Gemini feature flags...
+start "" "%CHROME%" --variations-override-country=us --enable-features=Glic,GlicSidePanel,GlicButton,GlicWarming,GlicZeroStateSuggestions
+echo [OK] Chrome started.
 echo.
 pause
